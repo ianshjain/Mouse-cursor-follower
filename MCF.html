@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mouse Cursor Follower</title>
+  <style>
+    /* Basic Page Styling */
+    body {
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      background: #121212;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    /* Control Panel Styling */
+    .controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00fff755;
+    }
+
+    .controls label, .controls select, .controls input {
+      margin-right: 10px;
+      font-size: 14px;
+    }
+
+    /* Main Follower Element */
+    .follower {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%; /* Default shape is circle */
+      background: radial-gradient(circle, #00fff7, #0077ff); /* Default color style */
+      pointer-events: none; /* Allows clicking through the element */
+      box-shadow: 0 0 30px #00fff788, 0 0 60px #00fff766;
+      transform: translate(-50%, -50%);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    /* Glowing Pulse Effect */
+    .follower::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: inherit;
+      filter: blur(10px);
+      opacity: 0.6;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.3);
+        opacity: 0.2;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+    }
+
+    /* Shape: Circle */
+    .circle {
+      border-radius: 50%;
+    }
+
+    /* Shape: Square */
+    .square {
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Control Panel to Change Shape and Color -->
+  <div class="controls">
+    <label for="shapeSelect">Shape:</label>
+    <select id="shapeSelect">
+      <option value="circle" selected>Circle</option>
+      <option value="square">Square</option>
+    </select>
+
+    <label for="colorPicker">Color:</label>
+    <input type="color" id="colorPicker" value="#00fff7">
+  </div>
+
+  <!-- Cursor Follower Object -->
+  <div class="follower circle"></div>
+
+  <script>
+    // DOM References
+    const follower = document.querySelector('.follower');
+    const shapeSelect = document.getElementById('shapeSelect');
+    const colorPicker = document.getElementById('colorPicker');
+
+    // Cursor Position (Mouse X & Y)
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    // Current Follower Position
+    let currentX = mouseX;
+    let currentY = mouseY;
+
+    // Smoothness of motion (between 0 and 1)
+    const speed = 0.15;
+
+    // Track mouse movement
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Animate follower toward the cursor (LERP-style motion)
+    function animate() {
+      currentX += (mouseX - currentX) * speed;
+      currentY += (mouseY - currentY) * speed;
+      follower.style.transform = `translate(${currentX}px, ${currentY}px)`;
+      requestAnimationFrame(animate); // Keeps the animation running
+    }
+
+    // Start the animation
+    animate();
+
+    // Handle shape change from dropdown
+    shapeSelect.addEventListener('change', () => {
+      const shape = shapeSelect.value;
+      follower.className = `follower ${shape}`;
+    });
+
+    // Handle color change from color input
+    colorPicker.addEventListener('input', () => {
+      const color = colorPicker.value;
+      follower.style.background = color;
+      follower.style.boxShadow = `0 0 30px ${color}88, 0 0 60px ${color}66`;
+    });
+  </script>
+</body>
+</html>
